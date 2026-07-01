@@ -1,0 +1,297 @@
+/* ==========================================================================
+   1. المتغيرات والبلور والخلفية (Cinematic Glassmorphism)
+   ========================================================================== */
+:root {
+    --bg-black: #060606;
+    --card-bg: rgba(255, 255, 255, 0.02);
+    --card-border: rgba(255, 255, 255, 0.05);
+    --card-hover-border: rgba(255, 255, 255, 0.15);
+    --text-white: #ffffff;
+    --text-light: #b5b5b5;
+    --text-muted: #555555;
+    --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+    /* إلغاء السهم الافتراضي للماوس لبناء الماوس الزجاجي الخاص بكِ */
+    cursor: none;
+}
+a, button, .project-row, .cert-card, .contact-icon {
+    cursor: none !important;
+}
+
+body {
+    background-color: var(--bg-black);
+    color: var(--text-white);
+    font-family: 'Outfit', 'Cairo', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* --- تصميم الماوس الدائري الزجاجي التفاعلي مع الإضاءة اللحظية --- */
+.custom-glass-cursor {
+    position: fixed;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+}
+
+/* تأثير التكبير عند الوقوف على روابط تفاعلية */
+.custom-glass-cursor.hovered {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* تنسيق الـ Canvas الخاص بالجزيئات المتحركة البيضاء */
+#particlesCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    pointer-events: none;
+}
+
+/* طبقة نويز الأفلام الكلاسيكية الخفيفة */
+.film-grain {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.018;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* الضوء التفاعلي التابع للماوس خلف العناصر ليعطيكِ شعور الـ Lights المضيء */
+.interactive-glow {
+    position: fixed;
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    transform: translate(-50%, -50%);
+    filter: blur(60px);
+}
+
+/* خط تقدم السكرول العلوي */
+.scroll-progress {
+    position: fixed;
+    top: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7));
+    width: 0%; z-index: 1001;
+}
+
+/* القالب الأساسي للزجاج والتوهج عند التحريك */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    border-radius: 14px;
+    transition: var(--transition-smooth);
+}
+.glass-card:hover {
+    border-color: var(--card-hover-border);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 40px 80px rgba(255, 255, 255, 0.01);
+}
+
+/* ==========================================================================
+   2. شريط التنقل الشفاف (Navbar)
+   ========================================================================== */
+.navbar {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 85px;
+    background: rgba(6, 6, 6, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.01);
+    z-index: 1000; transition: var(--transition-smooth);
+}
+.navbar.scrolled {
+    background: rgba(6, 6, 6, 0.8);
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.nav-container { max-width: 1200px; margin: 0 auto; height: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; }
+.nav-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text-white); text-decoration: none; letter-spacing: 3px; }
+.nav-links { display: flex; gap: 40px; }
+.nav-link { color: var(--text-light); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; font-weight: 400; letter-spacing: 0.5px; }
+.nav-link:hover, .nav-link.active { color: var(--text-white); text-shadow: 0 0 12px rgba(255,255,255,0.5); }
+
+/* ==========================================================================
+   3. قسم البطاقة المعلقة والهيرو (Hero Section)
+   ========================================================================== */
+.hero-section { min-height: 100vh; display: flex; align-items: center; padding: 120px 40px 40px; position: relative; }
+.hero-container { max-width: 1100px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 80px; }
+
+.card-rope-wrapper {
+    position: relative; display: flex; flex-direction: column; align-items: center;
+    animation: swingDrop 2.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+@keyframes swingDrop {
+    0% { transform: translateY(-100px) rotate(12deg); opacity: 0; }
+    60% { transform: translateY(0) rotate(-5deg); opacity: 1; }
+    80% { transform: translateY(0) rotate(2deg); }
+    100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+.hanging-rope { width: 1px; height: 70px; background: linear-gradient(transparent, var(--text-muted)); }
+.id-card { width: 235px; height: 345px; padding: 24px; text-align: center; border-radius: 18px; }
+.card-chip { width: 34px; height: 24px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.03); }
+.card-photo { width: 130px; height: 160px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); margin: 0 auto 20px; background: #111; }
+.card-photo img { width: 100%; height: 100%; object-fit: cover; }
+.card-info h3 { font-size: 0.95rem; letter-spacing: 1px; margin-bottom: 4px; font-weight: 600; }
+.card-info p { font-size: 0.75rem; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif; }
+
+.hero-text { max-width: 600px; text-align: left; }
+.hero-greet { font-size: 1.5rem; font-weight: 300; margin-bottom: 12px; color: var(--text-light); }
+.hero-title { font-family: 'Space Grotesk', sans-serif; font-size: 3.4rem; line-height: 1.15; margin-bottom: 24px; font-weight: 700; letter-spacing: -1px; }
+.hero-desc { font-size: 1.1rem; color: var(--text-light); line-height: 1.65; margin-bottom: 35px; font-weight: 300; }
+.hero-btns { display: flex; gap: 20px; }
+
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 26px; font-size: 0.95rem; text-decoration: none; border-radius: 7px; transition: var(--transition-smooth); font-family: 'Space Grotesk', sans-serif; font-weight: 500; }
+.btn-primary { background: var(--text-white); color: var(--bg-black); }
+.btn-primary:hover { box-shadow: 0 0 30px rgba(255,255,255,0.25); transform: translateY(-2px); }
+.btn-secondary { border: 1px solid var(--card-border); color: var(--text-white); background: rgba(255,255,255,0.01); }
+.btn-secondary:hover { background: rgba(255,255,255,0.05); border-color: var(--card-hover-border); transform: translateY(-2px); }
+
+.scroll-down-hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif; }
+
+/* ==========================================================================
+   4. الأقسام العامة والـ Journey
+   ========================================================================== */
+.about-section, .skills-section, .projects-section, .certs-section, .contact-section { padding: 90px 40px; max-width: 1100px; margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 55px; }
+.section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; letter-spacing: 2px; font-weight: 600; text-transform: uppercase; }
+.section-line { width: 30px; height: 1px; background: var(--text-muted); margin: 15px auto 0; }
+
+.about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; }
+.about-card, .timeline-container { padding: 40px; }
+.about-name { font-size: 1.9rem; margin-bottom: 8px; font-weight: 700; }
+.about-roles { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; }
+.about-p { font-size: 1rem; color: var(--text-light); line-height: 1.75; text-align: justify; font-weight: 300; }
+
+.timeline { display: flex; flex-direction: column; gap: 28px; margin-top: 20px; }
+.timeline-item { position: relative; padding-left: 25px; }
+.timeline-dot { position: absolute; left: 0; top: 8px; width: 5px; height: 5px; background: var(--text-white); border-radius: 50%; box-shadow: 0 0 8px var(--text-white); }
+.timeline-date { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 4px; font-size: 1.05rem; }
+.timeline-arrow { position: absolute; left: -3px; top: -16px; color: var(--text-muted); font-size: 0.8rem; }
+.timeline-content { color: var(--text-light); font-size: 0.95rem; font-weight: 300; }
+
+/* ==========================================================================
+   5. مهارات وأدوات مطورة (Skills Grid)
+   ========================================================================== */
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 25px; }
+.skill-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.skill-circle { width: 75px; height: 75px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; color: var(--text-light); }
+.skill-item span { font-size: 0.85rem; font-family: 'Space Grotesk', sans-serif; color: var(--text-light); text-align: center; font-weight: 400; }
+.skill-item span small { display: block; color: rgba(255,255,255,0.4); font-size: 0.75rem; margin-top: 2px; }
+.skill-item:hover .skill-circle { transform: scale(1.08) translateY(-4px); color: var(--text-white); border-color: var(--card-hover-border); box-shadow: 0 0 25px rgba(255,255,255,0.1); }
+
+/* ==========================================================================
+   6. الأكورديون الذكي للمشاريع (Projects Showcase)
+   ========================================================================== */
+.projects-list { display: flex; flex-direction: column; gap: 20px; }
+.project-row { padding: 25px 35px; overflow: hidden; }
+.project-summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.project-number { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; color: var(--text-muted); }
+.project-row-title { font-size: 1.2rem; font-weight: 500; flex: 1; text-align: left; }
+.project-meta-tags { display: flex; gap: 12px; }
+.project-meta-tags span { font-size: 0.75rem; font-family: 'Space Grotesk', sans-serif; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.04); padding: 3px 10px; border-radius: 20px; background: rgba(0,0,0,0.2); }
+.toggle-icon { color: var(--text-muted); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.project-details { max-height: 0; opacity: 0; transition: max-height 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; visibility: hidden; }
+.project-details.open { max-height: 1400px; opacity: 1; visibility: visible; margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.04); }
+.details-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; align-items: flex-start; }
+
+.details-img { width: 100%; overflow: hidden; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: #0f0f0f; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+.details-img img { width: 100%; height: auto; display: block; object-fit: contain; }
+
+.details-text { text-align: left; }
+.proj-intro { font-size: 1rem; color: var(--text-light); line-height: 1.7; margin-bottom: 15px; font-weight: 300; }
+.proj-meta-info { display: flex; flex-wrap: wrap; gap: 20px; font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 12px; font-family: 'Space Grotesk', sans-serif; }
+
+.details-text h4 { font-size: 0.95rem; margin: 18px 0 6px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-white); letter-spacing: 0.5px; text-transform: uppercase; }
+.details-text p { font-size: 0.95rem; color: var(--text-light); line-height: 1.65; font-weight: 300; text-align: justify; }
+.tech-stack-used { margin-top: 20px; font-size: 0.85rem; font-family: 'Space Grotesk', sans-serif; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.01); padding: 8px 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); display: inline-block; }
+.proj-links { margin-top: 25px; }
+
+/* ==========================================================================
+   7. كروت الشهادات الـ 6 (Flip Cards)
+   ========================================================================== */
+.certs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 25px; }
+.cert-card { height: 235px; perspective: 1200px; border: none; background: transparent; }
+.cert-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1); transform-style: preserve-3d; }
+.cert-card.flipped .cert-card-inner { transform: rotateY(180deg); }
+
+.cert-front, .cert-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; padding: 25px; }
+.cert-front { background: var(--card-bg); border: 1px solid var(--card-border); justify-content: center; align-items: center; text-align: center; }
+.cert-back { background: #0b0b0b; border: 1px solid rgba(255,255,255,0.15); padding: 0; overflow: hidden; transform: rotateY(180deg); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+.cert-back img { width: 100%; height: 100%; object-fit: contain; background-color: #0d0d0d; }
+.cert-badge { font-size: 1.6rem; color: var(--text-muted); margin-bottom: 12px; }
+.cert-front h3 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 600; line-height: 1.4; }
+.cert-front p { font-size: 0.85rem; color: var(--text-light); line-height: 1.5; font-weight: 300; }
+.flip-hint { margin-top: auto; font-size: 0.7rem; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ==========================================================================
+   8. وسائل التواصل والفوتر (Contact & Footer)
+   ========================================================================== */
+.contact-box { padding: 50px; text-align: center; max-width: 600px; margin: 0 auto; }
+.contact-lead { margin-bottom: 30px; color: var(--text-light); font-size: 1.05rem; font-weight: 300; }
+.contact-links { display: flex; justify-content: center; gap: 20px; }
+.contact-icon { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--card-border); display: flex; justify-content: center; align-items: center; font-size: 1.25rem; color: var(--text-light); text-decoration: none; transition: var(--transition-smooth); }
+.contact-icon:hover { color: var(--text-white); border-color: var(--card-hover-border); box-shadow: 0 0 20px rgba(255,255,255,0.12); transform: translateY(-3px); }
+
+.footer { padding: 50px 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.01); margin-top: 60px; }
+.dev-by { font-size: 0.85rem; color: var(--text-light); font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; }
+.thank-you { font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; }
+.text-glow { text-shadow: 0 0 15px rgba(255, 255, 255, 0.35); }
+
+/* ==========================================================================
+   9. شاشات الجوال والتجاوب (Responsive)
+   ========================================================================== */
+@media (max-width: 991px) {
+    html, body { cursor: default; } /* إعادة الماوس الطبيعي في أجهزة اللمس */
+    .custom-glass-cursor { display: none; }
+    .hero-container { flex-direction: column-reverse; text-align: center; gap: 45px; }
+    .hero-text { text-align: center; }
+    .hero-title { font-size: 2.6rem; }
+    .hero-btns { justify-content: center; }
+    .about-grid { grid-template-columns: 1fr; gap: 30px; }
+    .details-grid { grid-template-columns: 1fr; gap: 25px; }
+}
+
+@media (max-width: 600px) {
+    .navbar { height: 75px; }
+    .nav-links { display: none; }
+    .hero-title { font-size: 2.1rem; }
+    .hero-btns { flex-direction: column; width: 100%; gap: 12px; }
+    .btn { justify-content: center; width: 100%; }
+    .about-card, .timeline-container, .contact-box { padding: 25px 20px; }
+    .project-row { padding: 20px; }
+    .interactive-glow { display: none; }
+}
